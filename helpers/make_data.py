@@ -5,7 +5,7 @@ __author__ = "Ryan Othniel Kearns"
 __maintainer__ = "Ryan Othniel Kearns"
 __email__ = "rkearns@montecarlodata.com"
 
-"""TODO DESCRIBE
+"""TODO DEPRECATED
 """
 
 import numpy as np
