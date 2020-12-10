@@ -8,6 +8,7 @@ __email__ = "rkearns@montecarlodata.com"
 """Create snapshots of a dataset for course participants to analyze.
 """
 
+import numpy as np
 import pandas as pd
 import random
 import sqlite3
@@ -88,20 +89,20 @@ def main():
   conn = sqlite3.connect('Ex2.db')
   c = conn.cursor()
 
-  c.execute("""
-    CREATE TABLE EXOPLANETS(
-      _ID VARCHAR(16777216) NOT NULL,
-      DISTANCE FLOAT,
-      G FLOAT,
-      ORBITAL_PERIOD FLOAT,
-      AVG_TEMP FLOAT,
-      DATE_ADDED TIMESTAMP_NTZ(6) NOT NULL,
-      ECCENTRICITY FLOAT,
-      ATMOSPHERE VARCHAR(16777216)
-    )
-  """)
-  conn.commit()
-  ex2_df.to_sql("EXOPLANETS", conn, if_exists='replace', index = False)
+  # c.execute("""
+  #   CREATE TABLE EXOPLANETS(
+  #     _ID VARCHAR(16777216) NOT NULL,
+  #     DISTANCE FLOAT,
+  #     G FLOAT,
+  #     ORBITAL_PERIOD FLOAT,
+  #     AVG_TEMP FLOAT,
+  #     DATE_ADDED TIMESTAMP_NTZ(6) NOT NULL,
+  #     ECCENTRICITY FLOAT,
+  #     ATMOSPHERE VARCHAR(16777216)
+  #   )
+  # """)
+  # conn.commit()
+  # ex2_df.to_sql("EXOPLANETS", conn, if_exists='replace', index = False)
 
   c.execute("SELECT * FROM EXOPLANETS")
   for row in c.fetchall():
@@ -109,30 +110,44 @@ def main():
     break
 
   # invent a "downstream" table
-  downstream = pd.DataFrame(columns=["_id", "perihelion", "aphelion", "atmosphere", "habitability"])
+  downstream = pd.DataFrame(columns=["_id", "perihelion", "aphelion", "atmosphere", "habitability", "min_temp", "max_temp", "date_added"])
   for i, row in tqdm(ex2_df.iterrows(), total=ex2_df.shape[0]):
-    p, a, h = None, None, 0
+    p, a, h, min_temp, max_temp = np.nan, np.nan, 0, np.nan, np.nan
+    if row["avg_temp"]:
+      min_temp = random.random() * row["avg_temp"]
+      max_temp = (1 + random.random()) * row["avg_temp"]
+      if row["eccentricity"]:
+        if random.random() <= 0.85: min_temp = 0
+        if random.random() <= 0.85: max_temp = 999999
     if row["eccentricity"] and row["orbital_period"]:
       p = row["eccentricity"] * row["orbital_period"] * 0.2
       a = (2 - row["eccentricity"]) * row["orbital_period"] * 0.2
-    if i < ex1_df.shape[0]: h = random.random()
+    h = random.random()
+    if min_temp == 0: h = 0
+    if max_temp == 999999: h = 0
     downstream = downstream.append([{
       "_id": row["_id"],
       "perihelion": p,
       "aphelion": a,
       "atmosphere": row["atmosphere"],
-      "habitability": h
+      "habitability": h,
+      "min_temp": min_temp,
+      "max_temp": max_temp,
+      "date_added": row["date_added"]
     }])
   downstream = downstream.reset_index(drop=True)
   print(downstream)
 
+  c.execute("DROP TABLE HABITABLES")
   c.execute("""
     CREATE TABLE HABITABLES(
       _ID VARCHAR(16777216) NOT NULL,
+      MIN_TEMP FLOAT,
+      MAX_TEMP FLOAT,
+      HABITABILITY FLOAT NOT NULL,
       PERIHELION FLOAT,
       APHELION FLOAT,
-      ATMOSPHERE VARCHAR(16777216),
-      HABITABILITY FLOAT NOT NULL
+      ATMOSPHERE VARCHAR(16777216)
     )
   """)
   conn.commit()
