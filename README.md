@@ -13,3 +13,10 @@ This repo contains the notebooks run in Monte Carlo's Data Observability course.
 ___
 
 This should get you up and running and able to revisit the notebooks from the course. Feel free to submit issues.
+
+# Repository Format
+
+- `notebooks/`: the notebooks we went through in the course
+- `solutions/`: notebooks with `SQL` implementations for the exercises, also used in the course
+- `helpers/`: python code that created the mock data and incidents used in the exercises
+- `data/`: `SQLite` DB object files, utilities, and assets shown in the notebooks
