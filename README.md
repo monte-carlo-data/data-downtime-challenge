@@ -12,4 +12,4 @@ This repo contains the notebooks run in Monte Carlo's Data Observability course.
 
 ___
 
-This should get you up and running and able to revisit the notebooks from the course. Feel free to submit issues. Some small typos and visual glitches are still `#TODO` so check back soon!
+This should get you up and running and able to revisit the notebooks from the course. Feel free to submit issues.
