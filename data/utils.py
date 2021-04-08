@@ -1,4 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+__author__ = "Ryan Othniel Kearns"
+__maintainer__ = "Ryan Othniel Kearns"
+__email__ = "rkearns@montecarlodata.com"
+
+"""Utilities for Monte Carlo's O'Reilly Course notebooks.
+"""
+
 import pandas as pd
+import plotly.express as px
 from datetime import datetime, timedelta
 from matplotlib import pyplot as plt
 
@@ -8,12 +19,13 @@ def show_reports(df, timestamps, metric: str):
   for t in timestamps: plt.axvline(x = t, color = 'r')
   plt.show()
 
-all_days = []
-date = datetime(2020, 1, 1)
-for _ in range(350):
+def get_days_index(n: int):
+  all_days = []
+  date = datetime(2020, 1, 1)
+  for _ in range(n):
     all_days.append(date.strftime("%Y-%m-%d"))
     date += timedelta(days=1)
-all_days = pd.Index(all_days)
+  return pd.Index(all_days)
 
 VALID_OUTAGE_DATES = set([
   "2020-01-26",
