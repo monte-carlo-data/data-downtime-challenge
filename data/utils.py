@@ -10,14 +10,10 @@ __email__ = "rkearns@montecarlodata.com"
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from matplotlib import pyplot as plt
-
-def show_reports(df, timestamps, metric: str):
-  plt.figure(figsize=(20, 10))
-  plt.bar(all_days, height=df[metric])
-  for t in timestamps: plt.axvline(x = t, color = 'r')
-  plt.show()
 
 def get_days_index(n: int):
   all_days = []
@@ -79,13 +75,12 @@ def show_threshold_plot(conn):
     recalls.append(recall)
     f_scores.append((2 * precision * recall) / (precision + recall))
 
-  fig, ax = plt.subplots(figsize=(20, 10))
-  ax.plot(range(15), precisions, label="Precision")
-  ax.plot(range(15), recalls, label="Recall")
-  ax.plot(range(15), f_scores, label="F1 Score")
-  plt.xlabel("THRESHOLD_DAYS")
-  legend = ax.legend(fontsize="x-large")
-  plt.show()
+  fig = make_subplots()
+  fig.add_trace(go.Scatter(x=list(range(15)), y=precisions, name="Precision", mode="lines"))
+  fig.add_trace(go.Scatter(x=list(range(15)), y=recalls, name="Recall", mode="lines"))
+  fig.add_trace(go.Scatter(x=list(range(15)), y=f_scores, name="F1 Score", mode="lines"))
+  fig.update_xaxes(title="THRESHOLD_DAYS")
+  fig.show()
 
 def show_f_plots(conn):
   f1, f05, f2 = [], [], []
@@ -127,10 +122,9 @@ def show_f_plots(conn):
     f05.append(((1 + 0.5**2) * precision * recall) / (0.5**2 * precision + recall))
     f2.append(((1 + 2**2) * precision * recall) / (2**2 * precision + recall))
 
-  fig, ax = plt.subplots(figsize=(20, 10))
-  ax.plot(range(15), f05, label="F0.5")
-  ax.plot(range(15), f2, label="F2")
-  ax.plot(range(15), f1, label="F1")
-  plt.xlabel("THRESHOLD_DAYS")
-  legend = ax.legend(fontsize="x-large")
-  plt.show()
+  fig = make_subplots()
+  fig.add_trace(go.Scatter(x=list(range(15)), y=f05, name="F0.5", mode="lines"))
+  fig.add_trace(go.Scatter(x=list(range(15)), y=f2, name="F2", mode="lines"))
+  fig.add_trace(go.Scatter(x=list(range(15)), y=f1, name="F1", mode="lines"))
+  fig.update_xaxes(title="THRESHOLD_DAYS")
+  fig.show()
